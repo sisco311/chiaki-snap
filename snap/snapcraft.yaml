@@ -1,0 +1,204 @@
+name: chiaki
+title: chiaki
+
+adopt-info: chiaki
+
+summary: Free and Open Source PS4 Remote Play Client
+description: |
+  Chiaki is a Free and Open Source Software Client for PlayStation 4 Remote Play.
+  
+  Everything necessary for a full streaming session, including the initial registration and wakeup of the console, is supported. The following features however are yet to be implemented:
+  
+  * Congestion Control
+  * H264 Error Concealment (FEC and active error recovery however are implemented)
+  * Touchpad support (Triggering the Touchpad Button is currently possible by pressing T on the keyboard)
+  * Rumble
+  * Configurable Keybindings
+
+base: core18
+
+license: GPL-3.0
+grade: stable
+confinement: strict
+
+apps:
+  chiaki:
+    command: bin/desktop-launch $SNAP/bin/chiaki
+#    command: bin/chiaki
+    environment:
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/android:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+    desktop: share/applications/chiaki.desktop
+  psn-account-id:
+    command: bin/psn-account-id.py
+
+parts:
+  desktop-qt5:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    plugin: make
+    make-parameters: ["FLAVOR=qt5"]
+    build-packages:
+      - build-essential
+      - qtbase5-dev
+      - dpkg-dev
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - adwaita-icon-theme
+      - gnome-themes-standard
+      - shared-mime-info
+      - libqt5gui5
+      - libgdk-pixbuf2.0-0
+      - libqt5svg5 # for loading icon themes which are svg
+      - try: [appmenu-qt5] # not available on core18
+      - locales-all
+      - xdg-user-dirs
+      - fcitx-frontend-qt5
+
+  fontconfig:
+    source: https://gitlab.freedesktop.org/fontconfig/fontconfig.git
+    plugin: make
+    override-build: |
+      git checkout 2.13.91
+      ./autogen.sh --sysconfdir=/etc --prefix=/usr --mandir=/usr/share/man
+      snapcraftctl build
+  
+
+  cmake:
+    plugin: nil
+    override-build: |
+      wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
+      apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+      apt update
+      apt -y install cmake
+    build-packages:
+      - software-properties-common
+    prime: [-*]
+
+  protobuf:
+    plugin: nil
+    override-build: |
+      pip3 install protobuf       
+    build-packages:
+      - python3-pip
+    prime: [-*]
+
+  ffmpeg:
+    plugin: nil
+    override-build: |
+      add-apt-repository ppa:jonathonf/ffmpeg-4
+      apt update
+      apt -y install ffmpeg
+    build-packages:
+      - software-properties-common
+
+  ffmpeg-dev:
+    plugin: nil
+    override-build:
+      apt -y install libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavresample-dev libavutil-dev libswresample-dev libswscale-dev
+    prime: [-*]
+    after:
+      - ffmpeg 
+
+  chiaki:
+    source: https://github.com/thestr4ng3r/chiaki.git
+    plugin: cmake
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(git describe --tag)
+    override-build: |
+      install -D -m755 $SNAPCRAFT_PART_SRC/scripts/psn-account-id.py $SNAPCRAFT_PART_INSTALL/bin/psn-account-id.py
+      snapcraftctl build  
+    build-packages:
+      - python3-pip
+      - pkg-config
+      - libopus-dev
+      - libssl-dev
+      - qt5-default
+      - qtmultimedia5-dev
+      - libqt5svg5-dev
+#      - libavcodec-dev
+#      - libavdevice-dev
+#      - libavfilter-dev
+#      - libavformat-dev
+#      - libavresample-dev
+#      - libavutil-dev
+#      - libswresample-dev
+#      - libswscale-dev
+      - protobuf-compiler
+      - libsdl2-dev
+    stage-packages:
+      - libglu1-mesa
+      - libqt5multimedia5
+      - libslang2
+      - libqt5svg5
+      - libaom0
+      - libasound2
+      - libavcodec58
+      - libavutil56
+      - libcairo2
+      - libcodec2-0.7
+      - libcroco3
+      - libcrystalhd3
+      - libdatrie1
+      - libfdk-aac1
+      - libgdk-pixbuf2.0-0
+      - libgomp1
+      - libgsm1
+      - libmp3lame0
+      - libnuma1
+      - libopenjp2-7
+      - libopus0
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - librsvg2-2
+      - libsdl2-2.0-0
+      - libshine3
+      - libsnappy1v5
+      - libsndio6.1
+      - libsoxr0
+      - libspeex1
+      - libswresample3
+      - libthai0
+      - libtheora0
+      - libtwolame0
+      - libva-drm2
+      - libva-x11-2
+      - libva2
+      - libvdpau1
+      - libvpx5
+      - libwavpack1
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libwebp6
+      - libwebpmux3
+      - libx264-155
+      - libx265-179
+      - libxcursor1
+      - libxinerama1
+      - libxml2
+      - libxrandr2
+      - libxrender1
+      - libxss1
+      - libxvidcore4
+      - libzvbi0
+
+    after:
+      - cmake
+      - ffmpeg
+      - ffmpeg-dev
+      - protobuf
+plugs:
+  desktop:
+  desktop-legacy:
+  x11:
+  unity7:
+  wayland:
+  opengl:
+  home:
+  network:
+  audio-playback:
