@@ -57,7 +57,7 @@ parts:
   cmake:
     plugin: nil
     override-build: |
-      wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
+      wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
       apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
       apt update
       apt -y install cmake
