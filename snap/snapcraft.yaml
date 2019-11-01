@@ -24,9 +24,6 @@ confinement: strict
 apps:
   chiaki:
     command: bin/desktop-launch $SNAP/bin/chiaki
-#    command: bin/chiaki
-    environment:
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/android:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
     desktop: share/applications/chiaki.desktop
   psn-account-id:
     command: bin/psn-account-id.py
@@ -56,15 +53,6 @@ parts:
       - locales-all
       - xdg-user-dirs
       - fcitx-frontend-qt5
-
-#  fontconfig:
-#    source: https://gitlab.freedesktop.org/fontconfig/fontconfig.git
-#    plugin: make
-#    override-build: |
-#      git checkout 2.13.91
-#      ./autogen.sh --sysconfdir=/etc --prefix=/usr --mandir=/usr/share/man
-#      snapcraftctl build
-#    ...  
 
   cmake:
     plugin: nil
@@ -119,14 +107,6 @@ parts:
       - qt5-default
       - qtmultimedia5-dev
       - libqt5svg5-dev
-#      - libavcodec-dev
-#      - libavdevice-dev
-#      - libavfilter-dev
-#      - libavformat-dev
-#      - libavresample-dev
-#      - libavutil-dev
-#      - libswresample-dev
-#      - libswscale-dev
       - protobuf-compiler
       - libsdl2-dev
     stage-packages:
