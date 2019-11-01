@@ -57,14 +57,14 @@ parts:
       - xdg-user-dirs
       - fcitx-frontend-qt5
 
-  fontconfig:
-    source: https://gitlab.freedesktop.org/fontconfig/fontconfig.git
-    plugin: make
-    override-build: |
-      git checkout 2.13.91
-      ./autogen.sh --sysconfdir=/etc --prefix=/usr --mandir=/usr/share/man
-      snapcraftctl build
-  
+#  fontconfig:
+#    source: https://gitlab.freedesktop.org/fontconfig/fontconfig.git
+#    plugin: make
+#    override-build: |
+#      git checkout 2.13.91
+#      ./autogen.sh --sysconfdir=/etc --prefix=/usr --mandir=/usr/share/man
+#      snapcraftctl build
+#    ...  
 
   cmake:
     plugin: nil
